@@ -9,7 +9,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_s
 client = gspread.authorize(credentials)
 
 # Open the sheet
-sheet = client.open("Heart Drink Orders").sheet1
+sheet = client.open("heart_drink_orders").sheet1
 
 # Streamlit UI
 st.title("☕ Café Order Form")
