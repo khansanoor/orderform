@@ -1,29 +1,28 @@
 import streamlit as st
 import datetime
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
+# Connect to Google Sheets
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+credentials = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
+client = gspread.authorize(credentials)
+
+# Open the sheet
+sheet = client.open("Heart Drink Orders").sheet1
+
+# Streamlit UI
 st.title("☕ Café Order Form")
-st.markdown("Select a drink and enter your contact info.")
 
-# --- Form inputs ---
-drink = st.radio("Choose a drink:", [
-    "Iced Lavender Chai",
-    "Jashan (tangy, mango, papaya)",
-    "Humsafar (blackberry, lychee, pomegranate)"
-])
-
-name = st.text_input("Your Name")
-phone = st.text_input("Phone Number")
+drink = st.radio("Choose a drink:", ["Iced Lavender Chai", "Jashan", "Humsafar"])
+name = st.text_input("Name")
+phone = st.text_input("Phone")
 email = st.text_input("Email")
 
 # --- Submit button ---
 if st.button("Submit Order"):
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    st.success("Order submitted successfully!")
-    
-    st.write("### Order Details")
-    st.write(f"**Name:** {name}")
-    st.write(f"**Drink:** {drink}")
-    st.write(f"**Phone:** {phone}")
-    st.write(f"**Email:** {email}")
-    st.write(f"**Time:** {time}")
+    row = [name, drink, phone, email, time]
+    sheet.append_row(row)
+    st.success("Order submitted and saved to Google Sheet ✅")
 
